@@ -15,6 +15,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.View;
@@ -30,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
     ActivityMainBinding binding;
     TaskViewModel taskViewModel;
     LiveData<List<Task>> allTasks;
+    TasksRecyclerViewAdapter tasksAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,21 +42,31 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 //        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(binding.toolbar);
+
+        // Setting up recycler widget
+        binding.recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+
+        // Setting up ViewModel
         taskViewModel = new ViewModelProvider.AndroidViewModelFactory(getApplication())
                 .create(TaskViewModel.class);
 
+
+        // Observe the objects in tasks_table for change
         taskViewModel.getAllTasks().observe(this, new Observer<List<Task>>() {
             @Override
             public void onChanged(List<Task> tasks) {
-                for (Task task: tasks) {
-                    Log.d("Tasks", String.valueOf(task.getId()));
 
-                }
+                tasksAdapter = new TasksRecyclerViewAdapter(tasks, MainActivity.this);
+                binding.recyclerView.setAdapter(tasksAdapter);
+
             }
         });
 
+        // Functionality on "+" button click
         binding.fab.setOnClickListener(view -> {
-            Task task = new Task("Clean the room", Calendar.getInstance().getTime(),
+            Calendar cal = Calendar.getInstance();
+            cal.set(2021, 11, 11, 10, 10);
+            Task task = new Task("Clean the room", cal.getTime(),
                     Priority.MEDIUM, false);
 
             TaskViewModel.insertTask(task);

@@ -11,6 +11,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 
 
 import com.bawp.todoister.model.Task;
+import com.bawp.todoister.utils.TypesConverter;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

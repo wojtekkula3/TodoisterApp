@@ -7,11 +7,13 @@ import com.bawp.todoister.databinding.ActivityMainBinding;
 import com.bawp.todoister.model.Priority;
 import com.bawp.todoister.model.Task;
 import com.bawp.todoister.viewmodels.TaskViewModel;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -33,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     TaskViewModel taskViewModel;
     LiveData<List<Task>> allTasks;
     TasksRecyclerViewAdapter tasksAdapter;
+    BottomSheetFragment bottomSheetFragment;
 
 
     @Override
@@ -50,6 +53,13 @@ public class MainActivity extends AppCompatActivity {
         taskViewModel = new ViewModelProvider.AndroidViewModelFactory(getApplication())
                 .create(TaskViewModel.class);
 
+        // Setting up Fragment
+        bottomSheetFragment = new BottomSheetFragment();
+
+        // Setting Bottom sheet behaviour with constraint layout that is in XML file
+        ConstraintLayout constraintLayout = findViewById(R.id.bottomSheet);
+        BottomSheetBehavior<ConstraintLayout> bottomSheetBehavior = BottomSheetBehavior.from(constraintLayout);
+        bottomSheetBehavior.setPeekHeight(BottomSheetBehavior.STATE_HIDDEN); // button sheet always be hidden
 
         // Observe the objects in tasks_table for change
         taskViewModel.getAllTasks().observe(this, new Observer<List<Task>>() {
@@ -64,14 +74,21 @@ public class MainActivity extends AppCompatActivity {
 
         // Functionality on "+" button click
         binding.fab.setOnClickListener(view -> {
-            Calendar cal = Calendar.getInstance();
-            cal.set(2021, 11, 11, 10, 10);
-            Task task = new Task("Clean the room", cal.getTime(),
-                    Priority.MEDIUM, false);
+//            Calendar cal = Calendar.getInstance();
+//            cal.set(2021, 11, 11, 10, 10);
+//            Task task = new Task("Clean the room", cal.getTime(),
+//                    Priority.MEDIUM, false);
+//
+//            TaskViewModel.insertTask(task);
 
-            TaskViewModel.insertTask(task);
+            showBottomSheetDialog();
 
         });
+    }
+
+    public void showBottomSheetDialog()
+    {
+        bottomSheetFragment.show(getSupportFragmentManager(),bottomSheetFragment.getTag());
     }
 
     @Override

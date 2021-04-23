@@ -33,8 +33,6 @@ public class Task {
         this.isDone = isDone;
     }
 
-    public Task() {
-    }
 
     public long getId() {
         return id;

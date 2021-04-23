@@ -5,6 +5,7 @@ import android.os.Bundle;
 import com.bawp.todoister.R;
 import com.bawp.todoister.databinding.ActivityMainBinding;
 import com.bawp.todoister.model.Task;
+import com.bawp.todoister.viewmodels.SharedViewModel;
 import com.bawp.todoister.viewmodels.TaskViewModel;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
@@ -23,10 +24,11 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements onToDoClickListener{
 
-    ActivityMainBinding binding;
-    TaskViewModel taskViewModel;
-    LiveData<List<Task>> allTasks;
-    TasksRecyclerViewAdapter tasksAdapter;
+    ActivityMainBinding binding;        // view binding
+    TaskViewModel taskViewModel;        // view model for getting and editing tasks
+    SharedViewModel sharedViewModel;    // vie
+
+    TasksRecyclerViewAdapter tasksAdapter;      // Recycler View Adapter
     BottomSheetFragment bottomSheetFragment;
 
     @Override
@@ -40,9 +42,12 @@ public class MainActivity extends AppCompatActivity implements onToDoClickListen
         // Setting up recycler widget
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
 
-        // Setting up ViewModel
+        // Setting up ViewModel for managing tasks
         taskViewModel = new ViewModelProvider.AndroidViewModelFactory(getApplication())
                 .create(TaskViewModel.class);
+
+        // Setting up SharedViewModel which will share task to fragment
+        sharedViewModel = new ViewModelProvider(this).get(SharedViewModel.class);
 
         // Setting up Fragment
         bottomSheetFragment = new BottomSheetFragment();
@@ -104,6 +109,8 @@ public class MainActivity extends AppCompatActivity implements onToDoClickListen
     @Override
     public void onTaskClickListener(int adapterPosition, Task task) {
         Log.d("task_click", adapterPosition + " " + task.toString());
+        sharedViewModel.setSelectedTask(task);
+        showBottomSheetDialog();
     }
 
     @Override

@@ -7,18 +7,21 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CalendarView;
 import android.widget.RadioGroup;
 
 import com.bawp.todoister.R;
 import com.bawp.todoister.databinding.BottomSheetBinding;
 import com.bawp.todoister.model.Priority;
 import com.bawp.todoister.model.Task;
+import com.bawp.todoister.utils.Utils;
+import com.bawp.todoister.viewmodels.SharedViewModel;
 import com.bawp.todoister.viewmodels.TaskViewModel;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.android.material.snackbar.Snackbar;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.room.util.StringUtil;
 
@@ -30,7 +33,8 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
     BottomSheetBinding binding;
     Date taskEndDate;
     Priority priority;
-    Calendar calendar = Calendar.getInstance();      // Getting Java calendar class instance
+    Calendar calendar = Calendar.getInstance();         // Getting Java calendar class instance
+    SharedViewModel sharedViewModel;
 
     public BottomSheetFragment() {
     }
@@ -46,8 +50,48 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
         return view;
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        // Clear and set variables to default values when fragment is closed
+        sharedViewModel.setSelectedTask(null);
+        binding.enterTodoEt.setText("");
+        calendar.add(Calendar.DATE, 0);
+        taskEndDate = calendar.getTime();
+        priority= Priority.LOW;
+        binding.radioButtonLow.setChecked(true);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Check if SharedViewModel has a task to edit
+        if(sharedViewModel.getSelectedTask().getValue() != null)
+        {
+            Task task = sharedViewModel.getSelectedTask().getValue();
+            binding.enterTodoEt.setText(task.getTask());
+
+            switch (task.getPriority()) {
+                case LOW:
+                    binding.radioButtonLow.setChecked(true);
+                    break;
+                case MEDIUM:
+                    binding.radioButtonMed.setChecked(true);
+                    break;
+                case HIGH:
+                    binding.radioButtonHigh.setChecked(true);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        // Setting up SharedViewModel which will take task from MainActivity
+        sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
+        binding.radioButtonLow.setChecked(true);
         priority = Priority.LOW;
 
         // Open calendar on "calendar icon" button click
@@ -56,6 +100,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
                 binding.calendarGroup.setVisibility(View.VISIBLE);
             else
                 binding.calendarGroup.setVisibility(View.GONE);
+            Utils.hideSoftKeyboard(view1);
         });
 
         // Setting up the date from calendar
@@ -72,15 +117,25 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
             String taskText = binding.enterTodoEt.getText().toString().trim();
             if(!TextUtils.isEmpty(taskText) && taskEndDate != null)
             {
-                Task task = new Task(taskText, taskEndDate,
-                        priority, false);
-                Log.d("Insert_task", task.toString());
-                TaskViewModel.insertTask(task);
+                if(sharedViewModel.getSelectedTask().getValue() == null)
+                {
+                    Task task = new Task(taskText, taskEndDate,
+                            priority, false);
+                    Log.d("Insert_task", task.toString());
+                    TaskViewModel.insertTask(task);
+                }
+                else
+                {
+                    Task task = sharedViewModel.getSelectedTask().getValue();
+                    task.setTask(taskText);
+                    task.setEndDate(taskEndDate);
+                    task.setPriority(priority);
+                    TaskViewModel.updateTask(task);
+                }
+                this.dismiss();
             }
             else
-            {
-                Log.d("Insert_error","Did not provide some data (text, priority, date");
-            }
+                Snackbar.make(binding.saveTodoButton, R.string.empty_field, Snackbar.LENGTH_LONG).show();
 
         });
 
@@ -123,6 +178,5 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
                     priority = Priority.LOW;
             }
         });
-
     }
 }

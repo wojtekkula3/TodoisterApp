@@ -1,6 +1,8 @@
 package com.bawp.todoister.activities;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,6 +47,23 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<TasksRecycler
 
         holder.taskText.setText(task.getTask());
         holder.chip.setText(formattedDate);
+
+        // Object we define in XML that we can apply as a color, but will actually change colors,
+        // depending on the state of the View object to which it is applied
+        ColorStateList colorStateList = new ColorStateList(
+                new int[][]{
+                    new int[] {-android.R.attr.state_enabled},
+                    new int[] {android.R.attr.state_enabled}
+        },
+                new int[]{
+                        Color.LTGRAY,       // disabled
+                        Utils.priorityColor(task)
+                });
+
+        // Set the date chip and radio button color
+        holder.chip.setTextColor(Utils.priorityColor(task));
+        holder.chip.setChipIconTint(colorStateList);
+        holder.radioButton.setButtonTintList(colorStateList);
 
     }
 

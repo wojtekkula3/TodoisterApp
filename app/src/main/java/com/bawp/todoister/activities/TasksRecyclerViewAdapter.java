@@ -1,6 +1,7 @@
 package com.bawp.todoister.activities;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,10 +22,12 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<TasksRecycler
 
     private List<Task> tasksList;
     private Context context;
+    private final onToDoClickListener toDoClickListener;
 
-    public TasksRecyclerViewAdapter(List<Task> allTasks, Context context) {
+    public TasksRecyclerViewAdapter(List<Task> allTasks, Context context, onToDoClickListener toDoClickListener) {
         this.tasksList = allTasks;
         this.context = context;
+        this.toDoClickListener = toDoClickListener;
     }
 
     @NonNull
@@ -43,8 +46,6 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<TasksRecycler
         holder.taskText.setText(task.getTask());
         holder.chip.setText(formattedDate);
 
-
-
     }
 
     @Override
@@ -52,15 +53,41 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<TasksRecycler
         return tasksList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public RadioButton radioButton;
         public TextView taskText;
         public Chip chip;
+//        onToDoClickListener onToDoClickListener;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             radioButton = itemView.findViewById(R.id.todo_radio_button);
             taskText = itemView.findViewById(R.id.todo_row_todo);
             chip = itemView.findViewById(R.id.todo_row_chip);
+//            this.onToDoClickListener = toDoClickListener;
+
+            itemView.setOnClickListener(this::onClick);
+            radioButton.setOnClickListener(this::onClick);
+        }
+
+        @Override
+        public void onClick(View view) {
+            int id = view.getId();
+            Task currentTask = tasksList.get(getAdapterPosition());
+            if(id == R.id.todo_row_layout)
+                toDoClickListener.onTaskClickListener(getAdapterPosition(), currentTask);
+            else if(id == R.id.todo_radio_button)
+                toDoClickListener.onRadioClickListener(currentTask);
+
         }
     }
 }
+
+interface onToDoClickListener
+{
+    void onTaskClickListener(int adapterPosition, Task task);
+
+    void onRadioClickListener(Task task);
+
+}
+

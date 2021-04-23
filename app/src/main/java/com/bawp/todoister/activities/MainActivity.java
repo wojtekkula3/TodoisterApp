@@ -4,39 +4,30 @@ import android.os.Bundle;
 
 import com.bawp.todoister.R;
 import com.bawp.todoister.databinding.ActivityMainBinding;
-import com.bawp.todoister.model.Priority;
 import com.bawp.todoister.model.Task;
 import com.bawp.todoister.viewmodels.TaskViewModel;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
-import android.view.View;
-
 import android.view.Menu;
 import android.view.MenuItem;
 
-import java.util.Calendar;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements onToDoClickListener{
 
     ActivityMainBinding binding;
     TaskViewModel taskViewModel;
     LiveData<List<Task>> allTasks;
     TasksRecyclerViewAdapter tasksAdapter;
     BottomSheetFragment bottomSheetFragment;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,15 +53,12 @@ public class MainActivity extends AppCompatActivity {
         bottomSheetBehavior.setPeekHeight(BottomSheetBehavior.STATE_HIDDEN); // button sheet always be hidden
 
         // Observe the objects in tasks_table for change
-        taskViewModel.getAllTasks().observe(this, new Observer<List<Task>>() {
-            @Override
-            public void onChanged(List<Task> tasks) {
+        taskViewModel.getAllTasks().observe(this, tasks -> {
 
-                tasksAdapter = new TasksRecyclerViewAdapter(tasks, MainActivity.this);
+                tasksAdapter = new TasksRecyclerViewAdapter(tasks, MainActivity.this, this);
                 binding.recyclerView.setAdapter(tasksAdapter);
-
             }
-        });
+        );
 
         // Functionality on "+" button click
         binding.fab.setOnClickListener(view -> {
@@ -111,5 +99,18 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onTaskClickListener(int adapterPosition, Task task) {
+        Log.d("task_click", adapterPosition + " " + task.toString());
+    }
+
+    @Override
+    public void onRadioClickListener(Task task) {
+        Log.d("radio_click", task.toString());
+        TaskViewModel.deleteTask(task);
+        tasksAdapter.notifyDataSetChanged();
+
     }
 }

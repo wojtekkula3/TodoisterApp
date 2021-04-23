@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CalendarView;
+import android.widget.RadioGroup;
 
 import com.bawp.todoister.R;
 import com.bawp.todoister.databinding.BottomSheetBinding;
@@ -28,6 +29,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
 
     BottomSheetBinding binding;
     Date taskEndDate;
+    Priority priority;
     Calendar calendar = Calendar.getInstance();      // Getting Java calendar class instance
 
     public BottomSheetFragment() {
@@ -46,6 +48,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        priority = Priority.LOW;
 
         // Open calendar on "calendar icon" button click
         binding.todayCalendarButton.setOnClickListener(view1 -> {
@@ -70,7 +73,8 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
             if(!TextUtils.isEmpty(taskText) && taskEndDate != null)
             {
                 Task task = new Task(taskText, taskEndDate,
-                        Priority.LOW, false);
+                        priority, false);
+                Log.d("Insert_task", task.toString());
                 TaskViewModel.insertTask(task);
             }
             else
@@ -80,9 +84,44 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
 
         });
 
+        binding.todayChip.setOnClickListener(view1 -> {
+            calendar.add(Calendar.DATE, 0);
+            taskEndDate = calendar.getTime();
+        });
+
+        binding.tomorrowChip.setOnClickListener(view1 -> {
+            calendar.add(Calendar.DAY_OF_YEAR, 1);
+            taskEndDate = calendar.getTime();
+        });
+
+        binding.nextWeekChip.setOnClickListener(view1 -> {
+            calendar.add(Calendar.DAY_OF_YEAR, 7);
+            taskEndDate = calendar.getTime();
+        });
+
         binding.priorityTodoButton.setOnClickListener(view1 -> {
 
                 binding.radioGroupPriority.setVisibility(View.VISIBLE);
+        });
+
+        binding.priorityTodoButton.setOnClickListener(view1 -> {
+            if(binding.radioGroupPriority.getVisibility()==View.GONE)
+                binding.radioGroupPriority.setVisibility(View.VISIBLE);
+            else
+                binding.radioGroupPriority.setVisibility(View.GONE);
+
+        });
+
+        binding.radioGroupPriority.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                if(i==binding.radioButtonHigh.getId())
+                    priority = Priority.HIGH;
+                else if(i==binding.radioButtonMed.getId())
+                    priority = Priority.MEDIUM;
+                else
+                    priority = Priority.LOW;
+            }
         });
 
     }

@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import com.bawp.todoister.R;
 import com.bawp.todoister.databinding.BottomSheetBinding;
@@ -103,13 +104,12 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
             Utils.hideSoftKeyboard(view1);
         });
 
-        // Setting up the date from calendar
+        // Getting the date from calendar
         binding.calendarView.setOnDateChangeListener((calendarView, year, month, day) -> {
             Log.d("Calendar_date", "Date: " + year + "." + (month+1) + "." + day); // January in month variable is stored as 0 so it is important to add +1.
             calendar.clear();
             calendar.set(year, month, day);
             taskEndDate = calendar.getTime();
-
         });
 
         // Save the task after arrow button click
@@ -120,7 +120,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
                 if(sharedViewModel.getSelectedTask().getValue() == null)
                 {
                     Task task = new Task(taskText, taskEndDate,
-                            priority, false);
+                            priority, Calendar.getInstance().getTime(),false);
                     Log.d("Insert_task", task.toString());
                     TaskViewModel.insertTask(task);
                 }
@@ -135,7 +135,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
                 this.dismiss();
             }
             else
-                Snackbar.make(binding.saveTodoButton, R.string.empty_field, Snackbar.LENGTH_LONG).show();
+                Toast.makeText(getContext(), R.string.empty_field, Toast.LENGTH_LONG).show();
 
         });
 

@@ -26,11 +26,12 @@ public class Task {
     @ColumnInfo(name = "is_done")
     public boolean isDone;
 
-    public Task(String task, Date endDate, Priority priority, boolean isDone) {
+    public Task(String task, Date endDate, Priority priority, Date createdAt, boolean isDone) {
         this.task = task;
         this.endDate = endDate;
         this.priority = priority;
         this.isDone = isDone;
+        this.createdAt = createdAt;
     }
 
 

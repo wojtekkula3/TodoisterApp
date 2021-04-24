@@ -9,6 +9,7 @@ import androidx.room.Update;
 
 import com.bawp.todoister.model.Task;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Dao
@@ -31,6 +32,9 @@ public interface TaskDao {
 
     @Query("DELETE FROM tasks_table")
     void deleteAll();
+
+    @Delete
+    void deleteSelectedTasks(List<Task> tasks);
 
 
 

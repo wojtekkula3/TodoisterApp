@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -60,7 +61,7 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<TasksRecycler
                         Utils.priorityColor(task)
                 });
 
-        // Set the date chip and radio button color
+        // Setting the color of date chip and radio button
         holder.chip.setTextColor(Utils.priorityColor(task));
         holder.chip.setChipIconTint(colorStateList);
         holder.radioButton.setButtonTintList(colorStateList);
@@ -74,6 +75,7 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<TasksRecycler
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public RadioButton radioButton;
+        public RadioGroup radioGroup;
         public TextView taskText;
         public Chip chip;
 //        onToDoClickListener onToDoClickListener;
@@ -83,6 +85,7 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<TasksRecycler
             radioButton = itemView.findViewById(R.id.todo_radio_button);
             taskText = itemView.findViewById(R.id.todo_row_todo);
             chip = itemView.findViewById(R.id.todo_row_chip);
+            radioGroup = itemView.findViewById(R.id.todo_radio_group);
 //            this.onToDoClickListener = toDoClickListener;
 
             itemView.setOnClickListener(this::onClick);
@@ -96,8 +99,17 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<TasksRecycler
             if(id == R.id.todo_row_layout)
                 toDoClickListener.onTaskClickListener(getAdapterPosition(), currentTask);
             else if(id == R.id.todo_radio_button)
-                toDoClickListener.onRadioClickListener(currentTask);
-
+            {
+                if (!radioButton.isSelected()) {
+                    radioButton.setChecked(true);
+                    radioButton.setSelected(true);
+                } else {
+                    radioButton.setChecked(false);
+                    radioButton.setSelected(false);
+                    radioGroup.clearCheck();
+                }
+                toDoClickListener.onRadioClickListener(currentTask, radioButton.isChecked());
+            }
         }
     }
 }
@@ -106,7 +118,7 @@ interface onToDoClickListener
 {
     void onTaskClickListener(int adapterPosition, Task task);
 
-    void onRadioClickListener(Task task);
+    void onRadioClickListener(Task task, boolean isRadioChecked);
 
 }
 

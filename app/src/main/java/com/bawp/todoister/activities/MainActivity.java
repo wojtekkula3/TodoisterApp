@@ -19,17 +19,22 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements onToDoClickListener{
 
     ActivityMainBinding binding;        // view binding
-    TaskViewModel taskViewModel;        // view model for getting and editing tasks
-    SharedViewModel sharedViewModel;    // vie
+    TaskViewModel taskViewModel;        // view model for getting and setting tasks
+    SharedViewModel sharedViewModel;    // view model to share the task data to fragment
 
-    TasksRecyclerViewAdapter tasksAdapter;      // Recycler View Adapter
+    TasksRecyclerViewAdapter tasksAdapter;
     BottomSheetFragment bottomSheetFragment;
+
+    List<Task> tasksToDelete = new ArrayList<Task>(){};
+    boolean isDeleted = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,23 +64,21 @@ public class MainActivity extends AppCompatActivity implements onToDoClickListen
 
         // Observe the objects in tasks_table for change
         taskViewModel.getAllTasks().observe(this, tasks -> {
-
                 tasksAdapter = new TasksRecyclerViewAdapter(tasks, MainActivity.this, this);
                 binding.recyclerView.setAdapter(tasksAdapter);
             }
         );
 
-        // Functionality on "+" button click
+        // Functionality on "+" button click - open fragment
         binding.fab.setOnClickListener(view -> {
-//            Calendar cal = Calendar.getInstance();
-//            cal.set(2021, 11, 11, 10, 10);
-//            Task task = new Task("Clean the room", cal.getTime(),
-//                    Priority.MEDIUM, false);
-//
-//            TaskViewModel.insertTask(task);
-
             showBottomSheetDialog();
+        });
 
+        // Functionality on "trash" button click - delete selected tasks
+        binding.fabDelete.setOnClickListener(view -> {
+            TaskViewModel.deleteSelectedTasks(tasksToDelete);
+            isDeleted= true;
+            binding.fabDelete.setVisibility(View.GONE);
         });
     }
 
@@ -113,11 +116,27 @@ public class MainActivity extends AppCompatActivity implements onToDoClickListen
         showBottomSheetDialog();
     }
 
+    // Adding the task that user want to delete to the tasksToDelete list that consists of tasks to delete
     @Override
-    public void onRadioClickListener(Task task) {
-        Log.d("radio_click", task.toString());
-        TaskViewModel.deleteTask(task);
-        tasksAdapter.notifyDataSetChanged();
+    public void onRadioClickListener(Task task, boolean isRadioChecked) {
 
+        if(isDeleted==true)
+        {
+            tasksToDelete.clear();
+            isDeleted= false;
+        }
+
+        if(isRadioChecked)
+            tasksToDelete.add(task);
+        else if(!isRadioChecked)
+            tasksToDelete.remove(task);
+
+        if(tasksToDelete.size() != 0)
+            binding.fabDelete.setVisibility(View.VISIBLE);
+        else
+            binding.fabDelete.setVisibility(View.GONE);
+
+//        TaskViewModel.deleteTask(task);
+//        tasksAdapter.notifyDataSetChanged();
     }
 }

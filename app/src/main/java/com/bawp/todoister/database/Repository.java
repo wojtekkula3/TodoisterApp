@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData;
 
 import com.bawp.todoister.model.Task;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Repository {
@@ -52,6 +53,13 @@ public class Repository {
     {
         TaskRoomDatabase.databaseWriterExecutor.execute(()->{
             taskDao.updateTask(task);
+        });
+    }
+
+    public void deleteSelectedTasks(List<Task> tasks)
+    {
+        TaskRoomDatabase.databaseWriterExecutor.execute(()->{
+            taskDao.deleteSelectedTasks(tasks);
         });
     }
 }

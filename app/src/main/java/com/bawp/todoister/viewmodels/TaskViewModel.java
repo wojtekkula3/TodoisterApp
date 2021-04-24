@@ -9,6 +9,7 @@ import androidx.lifecycle.LiveData;
 import com.bawp.todoister.database.Repository;
 import com.bawp.todoister.model.Task;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TaskViewModel extends AndroidViewModel {
@@ -35,7 +36,7 @@ public class TaskViewModel extends AndroidViewModel {
         repo.insertTask(task);
     }
 
-    public static void deleteAll()
+    public static void deleteAllTasks()
     {
         repo.deleteAllTasks();
     }
@@ -49,6 +50,12 @@ public class TaskViewModel extends AndroidViewModel {
     {
         repo.updateTask(task);
     }
+
+    public static void deleteSelectedTasks(List<Task>tasks)
+    {
+        repo.deleteSelectedTasks(tasks);
+    }
+
 
 
 }

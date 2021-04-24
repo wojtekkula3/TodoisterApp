@@ -7,14 +7,20 @@
     android:layout_height="wrap_content"
     android:layout_marginTop="@dimen/top_margin">
 
-    <RadioButton
-        android:id="@+id/todo_radio_button"
+    <RadioGroup
+        android:id="@+id/todo_radio_group"
         android:layout_width="39dp"
         android:layout_height="39dp"
-        android:layout_marginStart="8dp"
-        android:padding="@dimen/dimen_0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <RadioButton
+            android:id="@+id/todo_radio_button"
+            android:layout_width="39dp"
+            android:layout_height="39dp"
+            android:layout_marginStart="8dp"
+            android:padding="@dimen/dimen_0" />
+    </RadioGroup>
 
     <TextView
         android:id="@+id/todo_row_todo"
@@ -22,10 +28,11 @@
         android:layout_height="wrap_content"
         android:text="TextView"
         android:textSize="18sp"
+        android:paddingLeft="6dp"
         app:layout_constraintBottom_toBottomOf="@+id/todo_row_chip"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/todo_radio_button"
+        app:layout_constraintStart_toEndOf="@+id/todo_radio_group"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.102" />
 
@@ -37,7 +44,7 @@
         android:text="@string/today"
         app:chipIcon="@drawable/ic_baseline_today_24"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/todo_radio_button" />
+        app:layout_constraintTop_toBottomOf="@+id/todo_radio_group" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -50,6 +57,8 @@
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/todo_row_chip"></LinearLayout>
+        app:layout_constraintTop_toBottomOf="@+id/todo_row_chip">
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
